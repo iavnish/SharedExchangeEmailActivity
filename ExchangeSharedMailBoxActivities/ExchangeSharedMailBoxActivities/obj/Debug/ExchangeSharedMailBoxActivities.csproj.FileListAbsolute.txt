@@ -1,0 +1,10 @@
+C:\Users\avnish.gupta\source\repos\ExchangeSharedMailBoxActivities\ExchangeSharedMailBoxActivities\bin\Debug\ExchangeSharedMailBoxActivities.dll
+C:\Users\avnish.gupta\source\repos\ExchangeSharedMailBoxActivities\ExchangeSharedMailBoxActivities\bin\Debug\ExchangeSharedMailBoxActivities.pdb
+C:\Users\avnish.gupta\source\repos\ExchangeSharedMailBoxActivities\ExchangeSharedMailBoxActivities\bin\Debug\Microsoft.Exchange.WebServices.dll
+C:\Users\avnish.gupta\source\repos\ExchangeSharedMailBoxActivities\ExchangeSharedMailBoxActivities\bin\Debug\Microsoft.Exchange.WebServices.pdb
+C:\Users\avnish.gupta\source\repos\ExchangeSharedMailBoxActivities\ExchangeSharedMailBoxActivities\bin\Debug\Microsoft.Exchange.WebServices.xml
+C:\Users\avnish.gupta\source\repos\ExchangeSharedMailBoxActivities\ExchangeSharedMailBoxActivities\obj\Debug\ExchangeSharedMailBoxActivities.csprojAssemblyReference.cache
+C:\Users\avnish.gupta\source\repos\ExchangeSharedMailBoxActivities\ExchangeSharedMailBoxActivities\obj\Debug\ExchangeSharedMailBoxActivities.csproj.CoreCompileInputs.cache
+C:\Users\avnish.gupta\source\repos\ExchangeSharedMailBoxActivities\ExchangeSharedMailBoxActivities\obj\Debug\ExchangeSharedMailBoxActivities.csproj.CopyComplete
+C:\Users\avnish.gupta\source\repos\ExchangeSharedMailBoxActivities\ExchangeSharedMailBoxActivities\obj\Debug\ExchangeSharedMailBoxActivities.dll
+C:\Users\avnish.gupta\source\repos\ExchangeSharedMailBoxActivities\ExchangeSharedMailBoxActivities\obj\Debug\ExchangeSharedMailBoxActivities.pdb
