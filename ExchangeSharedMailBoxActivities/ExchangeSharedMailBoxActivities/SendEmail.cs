@@ -1,15 +1,8 @@
 ﻿using System;
 using System.Activities;
 using System.ComponentModel;
-using System.Collections.Generic;
 using Microsoft.Exchange.WebServices.Data;
-using System.Collections.ObjectModel;
-using System.Activities.Presentation.PropertyEditing;
-using System.Windows;
-using System.Windows.Data;
-using System.Windows.Controls;
-using System.Activities.Presentation.Metadata;
-using System.Activities.Presentation;
+
 
 namespace ExchangeSharedMailBoxActivities
 {
@@ -89,6 +82,14 @@ namespace ExchangeSharedMailBoxActivities
         public InArgument<string[]> Attachments { get; set; }
 
         /// <summary>
+        /// Bcc recipient of the mail
+        /// </summary>
+        [Category("Options")]
+        [DisplayName("4.Bcc")]
+        [Description("Bcc recipient of the mail")]
+        public InArgument<String> Bcc { get; set; }
+
+        /// <summary>
         ///   This function for this class
         ///   It will send mails
         ///   Having option to have attachment
@@ -104,6 +105,7 @@ namespace ExchangeSharedMailBoxActivities
             bool isBodyHTML = IsBodyHTML.Get(context);
             string recipientEmail = RecipientEmail.Get(context);
             string cc = Cc.Get(context);
+            string bcc = Bcc.Get(context);
             string[] attachments = Attachments.Get(context);
 
         //***** Sending mail Logic ******
@@ -142,6 +144,17 @@ namespace ExchangeSharedMailBoxActivities
                 }
             }
 
+            //If BCC is available
+            if (bcc != null && bcc.Length > 0)
+            {
+                //Adding recipients to mail
+                string[] recipientsBcc = bcc.Split(';');
+                foreach (string recipient in recipientsBcc)
+                {
+                    email.BccRecipients.Add(recipient);
+                }
+            }
+
             //Sending mail and saving it into sent folder
             email.From = sender;
 
@@ -151,16 +164,13 @@ namespace ExchangeSharedMailBoxActivities
             view.PropertySet.Add(FolderSchema.DisplayName);
             view.Traversal = FolderTraversal.Deep;
             Mailbox mailbox = new Mailbox(sender);
-            FindFoldersResults findFolderResults = objExchangeService.FindFolders(new FolderId(WellKnownFolderName.SentItems, mailbox), view);
+            FindFoldersResults findFolderResults = objExchangeService.FindFolders(new FolderId(WellKnownFolderName.MsgFolderRoot, mailbox), view);
 
-            Console.WriteLine(findFolderResults.TotalCount);
             foreach (Folder folder in findFolderResults)
             {
-                Console.WriteLine(folder.DisplayName);
                 if(folder.DisplayName == "Sent Items")
                 {
                     email.SendAndSaveCopy(folder.Id);
-                    Console.WriteLine("Sendt");
                 }
             }
 

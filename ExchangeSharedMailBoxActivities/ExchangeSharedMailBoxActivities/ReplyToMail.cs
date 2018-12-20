@@ -53,20 +53,20 @@ namespace ExchangeSharedMailBoxActivities
         public InArgument<bool> IsBodyHTML { get; set; }
 
         /// <summary>
-        /// Email address of secondary recipient
-        /// </summary>
-        [Category("Options")]
-        [DisplayName("1.Recipient Email")]
-        [Description("Email address of secondary recipient")]
-        public InArgument<String> RecipientEmail { get; set; }
-
-        /// <summary>
         /// The secondary recipient of the mail as Cc
         /// </summary>
         [Category("Options")]
-        [DisplayName("2.Cc")]
+        [DisplayName("1.Cc")]
         [Description("The secondary recipient of the mail as Cc")]
         public InArgument<String> Cc { get; set; }
+
+        /// <summary>
+        /// Bcc recipient of the mail
+        /// </summary>
+        [Category("Options")]
+        [DisplayName("2.Bcc")]
+        [Description("Bcc recipient of the mail")]
+        public InArgument<String> Bcc { get; set; }
 
         /// <summary>
         /// File path of a attachment
@@ -85,6 +85,7 @@ namespace ExchangeSharedMailBoxActivities
         [DefaultValue(false)]
         public InArgument<bool> ReplyAll { get; set; }
 
+
         /// <summary>
         /// Shared Mail logic for replying to a mail
         /// </summary>
@@ -96,8 +97,9 @@ namespace ExchangeSharedMailBoxActivities
             Item mail = Mail.Get(context);
             string body = Body.Get(context);
             bool isBodyHTML = IsBodyHTML.Get(context);                 
-            string recipientEmail = RecipientEmail.Get(context);
+            //string recipientEmail = RecipientEmail.Get(context);
             string cc = Cc.Get(context);
+            string bcc = Bcc.Get(context);
             string sender = Sender.Get(context);
             string[] attachments = Attachments.Get(context);
             bool isReplyAll = ReplyAll.Get(context);
@@ -112,36 +114,78 @@ namespace ExchangeSharedMailBoxActivities
             else
                 responseMessage.BodyPrefix = body;
 
-            EmailMessage reply = responseMessage.Save();
+            //If CC is available
+            if (cc != null && cc.Length > 0)
+            {
+                //Adding recipients to mail
+                string[] recipientsCC = cc.Split(';');
+                foreach (string recipient in recipientsCC)
+                {
+                    responseMessage.CcRecipients.Add(recipient);
+                }
+            }
+
+            //If BCC is available
+            if (bcc != null && bcc.Length > 0)
+            {
+                //Adding recipients to mail
+                string[] recipientsBcc = bcc.Split(';');
+                foreach (string recipient in recipientsBcc)
+                {
+                    responseMessage.BccRecipients.Add(recipient);
+                }
+            }
+
+
             //Check if attachment is available
             //If attachments
             if (attachments != null && attachments.Length > 0)
-                foreach (string attachment in attachments)
+            {
+                FolderView view = new FolderView(10000);
+                view.PropertySet = new PropertySet(BasePropertySet.IdOnly);
+                view.PropertySet.Add(FolderSchema.DisplayName);
+                view.Traversal = FolderTraversal.Deep;
+                Mailbox mailbox = new Mailbox(sender);
+                FindFoldersResults findFolderResults = objExchangeService.FindFolders(new FolderId(WellKnownFolderName.MsgFolderRoot, mailbox), view);
+
+                foreach (Folder folder in findFolderResults)
                 {
-                    reply.Attachments.AddFileAttachment(attachment);
+                    if (folder.DisplayName == "Sent Items")
+                    {
+
+                        //Adding attachments to reply mail
+                        EmailMessage reply = responseMessage.Save(folder.Id);
+                        foreach (string attachment in attachments)
+                        {
+                            reply.Attachments.AddFileAttachment(attachment);
+                        }
+                        reply.Update(ConflictResolutionMode.AlwaysOverwrite);
+
+                        //Sending mail and saving to sent Items
+                        reply.SendAndSaveCopy(folder.Id);
+                    }
                 }
 
-            reply.Update(ConflictResolutionMode.AutoResolve);
-
-
-            //Adding recipients to mail
-            string[] recipients = recipientEmail.Split(';');
-            foreach (string recipient in recipients)
-            {
-                //reply.ReplyTo.Add(recipient);
-                reply.ToRecipients.Add(recipient);
-            }
-            Console.WriteLine(reply.ReplyTo);
-            
-            //Adding recipients to mail
-            string[] ccEmails = cc.Split(';');
-            foreach (string recipient in ccEmails)
-            {
-                reply.CcRecipients.Add(recipient);
             }
 
-            reply.From = sender;
-            reply.SendAndSaveCopy();
+            else
+            {
+                FolderView view = new FolderView(10000);
+                view.PropertySet = new PropertySet(BasePropertySet.IdOnly);
+                view.PropertySet.Add(FolderSchema.DisplayName);
+                view.Traversal = FolderTraversal.Deep;
+                Mailbox mailbox = new Mailbox(sender);
+                FindFoldersResults findFolderResults = objExchangeService.FindFolders(new FolderId(WellKnownFolderName.MsgFolderRoot, mailbox), view);
+
+                foreach (Folder folder in findFolderResults)
+                {
+                    if (folder.DisplayName == "Sent Items")
+                    {
+                        responseMessage.SendAndSaveCopy(folder.Id);
+                    }
+                }
+
+            }
         }
     }
 }

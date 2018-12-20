@@ -29,7 +29,7 @@ namespace ExchangeSharedMailBoxActivities
         /// Shared mailbox address
         /// </summary>
         [Category("Input")]
-        [DisplayName("MailBox")]
+        [DisplayName("Mailbox")]
         [Description("Shared mailbox address")]
         [RequiredArgument]
         public InArgument<String> MailboxName { get; set; }
